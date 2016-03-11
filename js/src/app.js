@@ -31,20 +31,15 @@ var HelloWorldLayer = cc.Layer.extend({
     },
 
     createTestMenu:function() {
-        var item1 = new cc.MenuItemLabel(new cc.LabelTTF("Test Item 1", "sans", 28), function() {
-            cc.log("Test Item 1");
-        });
+        sdkbox.PluginKochava.init();
 
-        var item2 = new cc.MenuItemLabel(new cc.LabelTTF("Test Item 2", "sans", 28), function() {
-            cc.log("Test Item 2");
-        });
-
-        var item3 = new cc.MenuItemLabel(new cc.LabelTTF("Test Item 3", "sans", 28), function() {
-            cc.log("Test Item 3");
+        var item1 = new cc.MenuItemLabel(new cc.LabelTTF("track event", "sans", 28), function() {
+            cc.log("track event");
+            sdkbox.PluginKochava.trackEvent("test event", "1111");
         });
 
         var winsize = cc.winSize;
-        var menu = new cc.Menu(item1, item2, item3);
+        var menu = new cc.Menu(item1);
         menu.x = winsize.width / 2;
         menu.y = winsize.height / 2;
         menu.alignItemsVerticallyWithPadding(20);

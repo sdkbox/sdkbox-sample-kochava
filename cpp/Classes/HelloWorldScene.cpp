@@ -1,5 +1,6 @@
 
 #include "HelloWorldScene.h"
+#include "PluginKochava/PluginKochava.h"
 
 USING_NS_CC;
 
@@ -58,16 +59,9 @@ void HelloWorld::createTestMenu()
 {
     auto menu = Menu::create();
 
-    menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("Test Item 1", "sans", 24), [](Ref*){
-        CCLOG("Test Item 1");
-    }));
-
-    menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("Test Item 2", "sans", 24), [](Ref*){
-        CCLOG("Test Item 2");
-    }));
-
-    menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("Test Item 3", "sans", 24), [](Ref*){
-        CCLOG("Test Item 3");
+    menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("track event", "sans", 24), [](Ref*){
+        CCLOG("track event");
+        sdkbox::PluginKochava::trackEvent("test event", "1111");
     }));
 
     menu->alignItemsVerticallyWithPadding(10);
