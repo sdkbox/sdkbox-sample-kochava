@@ -1,0 +1,16 @@
+{
+    "android": {
+        "kochava": {
+            "retrieveAttribution": 1, 
+            "kochava_app_id": "<YOUR APP ID>", 
+            "enableLogging": 1
+        }
+    }, 
+    "ios": {
+        "kochava": {
+            "retrieveAttribution": 1, 
+            "kochava_app_id": "<YOUR APP ID>", 
+            "enableLogging": 1
+        }
+    }
+}
