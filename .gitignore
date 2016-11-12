@@ -2,6 +2,8 @@
 contents.xcworkspacedata
 xcuserdata/
 
+*/backup-*.zip
+
 cpp/bin/
 cpp/proj.ios_mac/build/
 
