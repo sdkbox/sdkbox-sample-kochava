@@ -13,7 +13,7 @@
 #endif
 #ifdef SDKBOX_ENABLED
 #include "PluginKochavaJS.hpp"
-//#include "PluginKochavaJSHelper.h"
+#include "PluginKochavaJSHelper.h"
 #endif
 
 USING_NS_CC;
@@ -76,7 +76,7 @@ bool AppDelegate::applicationDidFinishLaunching()
     ScriptingCore* sc = ScriptingCore::getInstance();
 #ifdef SDKBOX_ENABLED
     sc->addRegisterCallback(register_all_PluginKochavaJS);
-//    sc->addRegisterCallback(register_all_PluginKochavaJS_helper);
+    sc->addRegisterCallback(register_all_PluginKochavaJS_helper);
 #endif
     sc->start();
     sc->runScript("script/jsb_boot.js");

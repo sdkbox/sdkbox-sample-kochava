@@ -49,6 +49,18 @@ bool HelloWorld::init()
                            -winsize.height / 2 + labelSize.height / 2 + 16));
     addChild(Menu::create(quit, NULL));
 
+    sdkbox::PluginKochava::setAttributionCallback([](const std::map<std::string, std::string>* attr) {
+        CCLOG("Kochava setAttributionCallback");
+        for (auto it : *attr) {
+            CCLOG("Kochava item %s:%s", it.first.c_str(), it.second.c_str());
+        }
+    });
+
+    sdkbox::PluginKochava::setBeaconCallback([](const char* s) {
+        CCLOG("sss");
+    });
+    sdkbox::PluginKochava::init();
+    
     // add test menu
     createTestMenu();
 
@@ -62,6 +74,13 @@ void HelloWorld::createTestMenu()
     menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("track event", "sans", 24), [](Ref*){
         CCLOG("track event");
         sdkbox::PluginKochava::trackEvent("test event", "1111");
+    }));
+    menu->addChild(MenuItemLabel::create(Label::createWithSystemFont("retrieve attribution", "sans", 24), [](Ref*){
+        CCLOG("retrieveAttribution");
+        auto attrs = sdkbox::PluginKochava::retrieveAttribution();
+        for (auto it : *attrs) {
+            CCLOG("Kochava item %s:%s", it.first.c_str(), it.second.c_str());
+        }
     }));
 
     menu->alignItemsVerticallyWithPadding(10);

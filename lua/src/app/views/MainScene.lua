@@ -19,15 +19,26 @@ end
 
 function MainScene:setupTestMenu()
     sdkbox.PluginKochava:init()
-
-    local label1 = cc.Label:createWithSystemFont("track event", "sans", 28)
-    local item1 = cc.MenuItemLabel:create(label1)
-    item1:onClicked(function()
-        print("track event")
-        sdkbox.PluginKochava:trackEvent("test event", "1111")
+    sdkbox.PluginKochava:setAttributionCallback(function(t)
+        dump(t)
+    end)
+    sdkbox.PluginKochava:setBeaconCallback(function(s)
+        print(s)
     end)
 
-    local menu = cc.Menu:create(item1)
+    local item1 = cc.MenuItemLabel:create(cc.Label:createWithSystemFont("track event", "sans", 28))
+        :onClicked(function()
+            print("track event")
+            sdkbox.PluginKochava:trackEvent("test event", "1111")
+        end)
+    local item2 = cc.MenuItemLabel:create(cc.Label:createWithSystemFont("retrieve attribution", "sans", 28))
+        :onClicked(function()
+            print("retrieve attribution")
+            local attribution = sdkbox.PluginKochava:retrieveAttribution()
+            dump(attribution)
+        end)
+
+    local menu = cc.Menu:create(item1, item2)
     menu:alignItemsVerticallyWithPadding(24)
     self:addChild(menu)
 end
