@@ -1,5 +1,4 @@
-LOCAL_PATH := $(call \
-my-dir)
+LOCAL_PATH := $(call my-dir)
 
 include $(CLEAR_VARS)
 
@@ -16,7 +15,9 @@ hellojavascript/main.cpp \
 ../../Classes/PluginKochavaJS.cpp \
 ../../Classes/PluginKochavaJS.hpp \
 ../../Classes/SDKBoxJSHelper.cpp \
-../../Classes/SDKBoxJSHelper.h
+../../Classes/SDKBoxJSHelper.h \
+../../Classes/PluginKochavaJSHelper.cpp \
+../../Classes/PluginKochavaJSHelper.h
 
 LOCAL_CPPFLAGS := -DSDKBOX_ENABLED
 LOCAL_LDLIBS := -landroid \

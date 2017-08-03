@@ -49,6 +49,9 @@ namespace sdkbox
          * @brief spatial event to help visualize data
          *
          * http://support.kochava.com/support/solutions/articles/1000059874-ios-sdk-documentation#senspa
+         *
+         * just support on ios
+         *
          */
         static void spatialEvent(const char* title, float x, float y, float z);
 

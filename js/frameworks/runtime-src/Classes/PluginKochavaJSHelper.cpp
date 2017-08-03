@@ -25,13 +25,13 @@ public:
         return obj;
     }
 
-	void setBeaconData(const std::string& data) {
-		_beaconData = data;
-	}
+    void setBeaconData(const std::string& data) {
+        _beaconData = data;
+    }
 
-	void setAttributionData(const std::map<std::string, std::string>& data) {
-		_attributionData = data;
-	}
+    void setAttributionData(const std::map<std::string, std::string>& data) {
+        _attributionData = data;
+    }
 
     void start() {
         Director::getInstance()->getScheduler()->schedule(schedule_selector(JsKochavaCallbackObj::callback), this, 0.1, 0, 0.0f, false);
@@ -63,17 +63,19 @@ public:
         jsval func_handle;
 #endif
 
-        jsval dataVal[2];
+        JS::Value dataVal[2];
         int datalen = 0;
 
         if (0 == _eventName.compare("attributionCallback"))
         {
-            dataVal[0] = std_map_string_string_to_jsval(cx, _attributionData);
+            JS::RootedValue jsMap(cx);
+            sdkbox::std_map_string_string_to_jsval(cx, _attributionData, &jsMap);
+            dataVal[0] = jsMap;
             datalen = 1;
         }
         else if (0 == _eventName.compare("beaconCallback"))
         {
-            dataVal[0] = std_string_to_jsval(cx, _beaconData);
+            dataVal[0] = SB_STR_TO_JSVAL(cx, _beaconData);
             datalen = 1;
         }
         else
@@ -85,7 +87,7 @@ public:
         {
             if (!JS_GetProperty(cx, obj, func_name, &func_handle))
                 return;
-            if (func_handle == JSVAL_VOID)
+            if (func_handle == JS::NullValue())
                 return;
 
 #if MOZJS_MAJOR_VERSION >= 31
@@ -112,24 +114,24 @@ protected:
 
 static JSObject* _JSKochavaAttributionDelegate = 0;
 static void __kochavaAttributionCallback(const std::map<std::string, std::string>* attributionData) {
-	if (_JSKochavaAttributionDelegate && attributionData) {
+    if (_JSKochavaAttributionDelegate && attributionData) {
         JsKochavaCallbackObj* obj = JsKochavaCallbackObj::create("attributionCallback", _JSKochavaAttributionDelegate);
         obj->setAttributionData(*attributionData);
         obj->start();
-	}
+    }
 }
 
 static JSObject* _JSKochavaBeaconDelegate = 0;
 static void __kochavaBeaconCallback(const char* beaconData) {
-	if (_JSKochavaBeaconDelegate && beaconData) {
+    if (_JSKochavaBeaconDelegate && beaconData) {
         JsKochavaCallbackObj* obj = JsKochavaCallbackObj::create("beaconCallback", _JSKochavaBeaconDelegate);
         obj->setBeaconData(std::string(beaconData));
         obj->start();
-	}
+    }
 }
 
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_setAttributionCallback(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_setAttributionCallback(JSContext *cx, uint32_t argc, JS::Value *vp)
 #elif defined(JS_VERSION)
 JSBool js_PluginKochavaJS_PluginKochava_setAttributionCallback(JSContext *cx, uint32_t argc, jsval *vp)
 #endif
@@ -154,12 +156,12 @@ JSBool js_PluginKochavaJS_PluginKochava_setAttributionCallback(JSContext *cx, ui
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_setAttributionCallback : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_setAttributionCallback : wrong number of arguments");
     return false;
 }
 
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_setBeaconCallback(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_setBeaconCallback(JSContext *cx, uint32_t argc, JS::Value *vp)
 #elif defined(JS_VERSION)
 JSBool js_PluginKochavaJS_PluginKochava_setBeaconCallback(JSContext *cx, uint32_t argc, jsval *vp)
 #endif
@@ -184,12 +186,12 @@ JSBool js_PluginKochavaJS_PluginKochava_setBeaconCallback(JSContext *cx, uint32_
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_setBeaconCallback : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_setBeaconCallback : wrong number of arguments");
     return false;
 }
 
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_retrieveAttribution(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_retrieveAttribution(JSContext *cx, uint32_t argc, JS::Value *vp)
 #elif defined(JS_VERSION)
 JSBool js_PluginKochavaJS_PluginKochava_retrieveAttribution(JSContext *cx, uint32_t argc, jsval *vp)
 #endif
@@ -197,19 +199,17 @@ JSBool js_PluginKochavaJS_PluginKochava_retrieveAttribution(JSContext *cx, uint3
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     if (argc == 0) {
         const std::map<std::string, std::string>* ret = sdkbox::PluginKochava::retrieveAttribution();
-        jsval jsret = JSVAL_NULL;
+        JS::RootedValue jsret(cx);
         do {
             if (ret) {
-                jsret = sdkbox::std_map_string_string_to_jsval(cx, *ret);
-            } else {
-                jsret = JSVAL_NULL;
+                sdkbox::std_map_string_string_to_jsval(cx, *ret, &jsret);
             }
         } while (0);
 
         args.rval().set(jsret);
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_retrieveAttribution : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_retrieveAttribution : wrong number of arguments");
     return false;
 }
 
@@ -251,4 +251,3 @@ void register_all_PluginKochavaJS_helper(JSContext* cx, JSObject* global) {
     KOCHAVA_JS_FUNCTIONS
 }
 #endif
-

@@ -5,47 +5,15 @@
 
 
 #if defined(MOZJS_MAJOR_VERSION)
-#if MOZJS_MAJOR_VERSION >= 33
+#if MOZJS_MAJOR_VERSION >= 52
+#elif MOZJS_MAJOR_VERSION >= 33
 template<class T>
 static bool dummy_constructor(JSContext *cx, uint32_t argc, jsval *vp) {
-    JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
-    JS::RootedValue initializing(cx);
-    bool isNewValid = true;
-    if (isNewValid)
-    {
-        TypeTest<T> t;
-        js_type_class_t *typeClass = nullptr;
-        std::string typeName = t.s_name();
-        auto typeMapIter = _js_global_type_map.find(typeName);
-        CCASSERT(typeMapIter != _js_global_type_map.end(), "Can't find the class type!");
-        typeClass = typeMapIter->second;
-        CCASSERT(typeClass, "The value is null.");
-
-#if (SDKBOX_COCOS_JSB_VERSION >= 2)
-        JS::RootedObject proto(cx, typeClass->proto.ref());
-        JS::RootedObject parent(cx, typeClass->parentProto.ref());
-#else
-        JS::RootedObject proto(cx, typeClass->proto.get());
-        JS::RootedObject parent(cx, typeClass->parentProto.get());
-#endif
-        JS::RootedObject _tmp(cx, JS_NewObject(cx, typeClass->jsclass, proto, parent));
-
-        T* cobj = new T();
-        js_proxy_t *pp = jsb_new_proxy(cobj, _tmp);
-        AddObjectRoot(cx, &pp->obj);
-        args.rval().set(OBJECT_TO_JSVAL(_tmp));
-        return true;
-    }
-
+    JS_ReportErrorUTF8(cx, "Constructor for the requested class is not available, please refer to the API reference.");
     return false;
 }
 
-static bool empty_constructor(JSContext *cx, uint32_t argc, jsval *vp) {
-    return false;
-}
-
-static bool js_is_native_obj(JSContext *cx, uint32_t argc, jsval *vp)
-{
+static bool js_is_native_obj(JSContext *cx, uint32_t argc, jsval *vp) {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     args.rval().setBoolean(true);
     return true;
@@ -107,10 +75,11 @@ static JSBool empty_constructor(JSContext *cx, uint32_t argc, jsval *vp) {
 }
 #endif
 JSClass  *jsb_sdkbox_PluginKochava_class;
+#if MOZJS_MAJOR_VERSION < 33
 JSObject *jsb_sdkbox_PluginKochava_prototype;
-
+#endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_sendDeepLink(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_sendDeepLink(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     bool ok = true;
@@ -124,7 +93,7 @@ bool js_PluginKochavaJS_PluginKochava_sendDeepLink(JSContext *cx, uint32_t argc,
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_sendDeepLink : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_sendDeepLink : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -147,7 +116,7 @@ JSBool js_PluginKochavaJS_PluginKochava_sendDeepLink(JSContext *cx, uint32_t arg
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_spatialEvent(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_spatialEvent(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     bool ok = true;
@@ -165,7 +134,7 @@ bool js_PluginKochavaJS_PluginKochava_spatialEvent(JSContext *cx, uint32_t argc,
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_spatialEvent : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_spatialEvent : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -192,19 +161,19 @@ JSBool js_PluginKochavaJS_PluginKochava_spatialEvent(JSContext *cx, uint32_t arg
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_setLimitAdTracking(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_setLimitAdTracking(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     bool ok = true;
     if (argc == 1) {
         bool arg0;
-        arg0 = JS::ToBoolean(args.get(0));
+        ok &= sdkbox::js_to_bool(cx, args.get(0), (bool *)&arg0);
         JSB_PRECONDITION2(ok, cx, false, "js_PluginKochavaJS_PluginKochava_setLimitAdTracking : Error processing arguments");
         sdkbox::PluginKochava::setLimitAdTracking(arg0);
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_setLimitAdTracking : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_setLimitAdTracking : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -214,7 +183,7 @@ JSBool js_PluginKochavaJS_PluginKochava_setLimitAdTracking(JSContext *cx, uint32
     JSBool ok = JS_TRUE;
     if (argc == 1) {
         bool arg0;
-        arg0 = JS::ToBoolean(argv[0]);
+        ok &= sdkbox::js_to_bool(cx, argv[0], (bool *)&arg0);
         JSB_PRECONDITION2(ok, cx, JS_FALSE, "Error processing arguments");
         sdkbox::PluginKochava::setLimitAdTracking(arg0);
         JS_SET_RVAL(cx, vp, JSVAL_VOID);
@@ -225,19 +194,19 @@ JSBool js_PluginKochavaJS_PluginKochava_setLimitAdTracking(JSContext *cx, uint32
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_enableLogging(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_enableLogging(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     bool ok = true;
     if (argc == 1) {
         bool arg0;
-        arg0 = JS::ToBoolean(args.get(0));
+        ok &= sdkbox::js_to_bool(cx, args.get(0), (bool *)&arg0);
         JSB_PRECONDITION2(ok, cx, false, "js_PluginKochavaJS_PluginKochava_enableLogging : Error processing arguments");
         sdkbox::PluginKochava::enableLogging(arg0);
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_enableLogging : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_enableLogging : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -247,7 +216,7 @@ JSBool js_PluginKochavaJS_PluginKochava_enableLogging(JSContext *cx, uint32_t ar
     JSBool ok = JS_TRUE;
     if (argc == 1) {
         bool arg0;
-        arg0 = JS::ToBoolean(argv[0]);
+        ok &= sdkbox::js_to_bool(cx, argv[0], (bool *)&arg0);
         JSB_PRECONDITION2(ok, cx, JS_FALSE, "Error processing arguments");
         sdkbox::PluginKochava::enableLogging(arg0);
         JS_SET_RVAL(cx, vp, JSVAL_VOID);
@@ -258,7 +227,7 @@ JSBool js_PluginKochavaJS_PluginKochava_enableLogging(JSContext *cx, uint32_t ar
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_trackEvent(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_trackEvent(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     bool ok = true;
@@ -272,7 +241,7 @@ bool js_PluginKochavaJS_PluginKochava_trackEvent(JSContext *cx, uint32_t argc, j
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_trackEvent : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_trackEvent : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -295,7 +264,7 @@ JSBool js_PluginKochavaJS_PluginKochava_trackEvent(JSContext *cx, uint32_t argc,
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_init(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_init(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     if (argc == 0) {
@@ -303,7 +272,7 @@ bool js_PluginKochavaJS_PluginKochava_init(JSContext *cx, uint32_t argc, jsval *
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_init : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_init : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -319,7 +288,7 @@ JSBool js_PluginKochavaJS_PluginKochava_init(JSContext *cx, uint32_t argc, jsval
 }
 #endif
 #if defined(MOZJS_MAJOR_VERSION)
-bool js_PluginKochavaJS_PluginKochava_shutdown(JSContext *cx, uint32_t argc, jsval *vp)
+bool js_PluginKochavaJS_PluginKochava_shutdown(JSContext *cx, uint32_t argc, JS::Value *vp)
 {
     JS::CallArgs args = JS::CallArgsFromVp(argc, vp);
     if (argc == 0) {
@@ -327,7 +296,7 @@ bool js_PluginKochavaJS_PluginKochava_shutdown(JSContext *cx, uint32_t argc, jsv
         args.rval().setUndefined();
         return true;
     }
-    JS_ReportError(cx, "js_PluginKochavaJS_PluginKochava_shutdown : wrong number of arguments");
+    JS_ReportErrorUTF8(cx, "js_PluginKochavaJS_PluginKochava_shutdown : wrong number of arguments");
     return false;
 }
 #elif defined(JS_VERSION)
@@ -346,33 +315,19 @@ JSBool js_PluginKochavaJS_PluginKochava_shutdown(JSContext *cx, uint32_t argc, j
 
 void js_PluginKochavaJS_PluginKochava_finalize(JSFreeOp *fop, JSObject *obj) {
     CCLOGINFO("jsbindings: finalizing JS object %p (PluginKochava)", obj);
-    js_proxy_t* nproxy;
-    js_proxy_t* jsproxy;
-
-#if (SDKBOX_COCOS_JSB_VERSION >= 2)
-    JSContext *cx = ScriptingCore::getInstance()->getGlobalContext();
-    JS::RootedObject jsobj(cx, obj);
-    jsproxy = jsb_get_js_proxy(jsobj);
-#else
-    jsproxy = jsb_get_js_proxy(obj);
-#endif
-
-    if (jsproxy) {
-        nproxy = jsb_get_native_proxy(jsproxy->ptr);
-
-        sdkbox::PluginKochava *nobj = static_cast<sdkbox::PluginKochava *>(nproxy->ptr);
-        if (nobj)
-            delete nobj;
-
-        jsb_remove_proxy(nproxy, jsproxy);
-    }
 }
 
 #if defined(MOZJS_MAJOR_VERSION)
 #if MOZJS_MAJOR_VERSION >= 33
 void js_register_PluginKochavaJS_PluginKochava(JSContext *cx, JS::HandleObject global) {
-    jsb_sdkbox_PluginKochava_class = (JSClass *)calloc(1, sizeof(JSClass));
-    jsb_sdkbox_PluginKochava_class->name = "PluginKochava";
+    static JSClass PluginAgeCheq_class = {
+        "PluginKochava",
+        JSCLASS_HAS_PRIVATE,
+        nullptr
+    };
+    jsb_sdkbox_PluginKochava_class = &PluginAgeCheq_class;
+
+#if MOZJS_MAJOR_VERSION < 52
     jsb_sdkbox_PluginKochava_class->addProperty = JS_PropertyStub;
     jsb_sdkbox_PluginKochava_class->delProperty = JS_DeletePropertyStub;
     jsb_sdkbox_PluginKochava_class->getProperty = JS_PropertyStub;
@@ -382,9 +337,9 @@ void js_register_PluginKochavaJS_PluginKochava(JSContext *cx, JS::HandleObject g
     jsb_sdkbox_PluginKochava_class->convert = JS_ConvertStub;
     jsb_sdkbox_PluginKochava_class->finalize = js_PluginKochavaJS_PluginKochava_finalize;
     jsb_sdkbox_PluginKochava_class->flags = JSCLASS_HAS_RESERVED_SLOTS(2);
+#endif
 
     static JSPropertySpec properties[] = {
-        JS_PSG("__nativeObj", js_is_native_obj, JSPROP_PERMANENT | JSPROP_ENUMERATE),
         JS_PS_END
     };
 
@@ -403,24 +358,24 @@ void js_register_PluginKochavaJS_PluginKochava(JSContext *cx, JS::HandleObject g
         JS_FS_END
     };
 
-    jsb_sdkbox_PluginKochava_prototype = JS_InitClass(
+    JS::RootedObject parent_proto(cx, nullptr);
+    JSObject* objProto = JS_InitClass(
         cx, global,
-        JS::NullPtr(), // parent proto
+        parent_proto,
         jsb_sdkbox_PluginKochava_class,
         dummy_constructor<sdkbox::PluginKochava>, 0, // no constructor
         properties,
         funcs,
         NULL, // no static properties
         st_funcs);
-    // make the class enumerable in the registered namespace
-//  bool found;
-//FIXME: Removed in Firefox v27
-//  JS_SetPropertyAttributes(cx, global, "PluginKochava", JSPROP_ENUMERATE | JSPROP_READONLY, &found);
 
-    // add the proto and JSClass to the type->js info hash table
+    JS::RootedObject proto(cx, objProto);
 #if (SDKBOX_COCOS_JSB_VERSION >= 2)
-    JS::RootedObject proto(cx, jsb_sdkbox_PluginKochava_prototype);
+#if MOZJS_MAJOR_VERSION >= 52
+    jsb_register_class<sdkbox::PluginKochava>(cx, jsb_sdkbox_PluginKochava_class, proto);
+#else
     jsb_register_class<sdkbox::PluginKochava>(cx, jsb_sdkbox_PluginKochava_class, proto, JS::NullPtr());
+#endif
 #else
     TypeTest<sdkbox::PluginKochava> t;
     js_type_class_t *p;
@@ -429,11 +384,19 @@ void js_register_PluginKochavaJS_PluginKochava(JSContext *cx, JS::HandleObject g
     {
         p = (js_type_class_t *)malloc(sizeof(js_type_class_t));
         p->jsclass = jsb_sdkbox_PluginKochava_class;
-        p->proto = jsb_sdkbox_PluginKochava_prototype;
+        p->proto = objProto;
         p->parentProto = NULL;
         _js_global_type_map.insert(std::make_pair(typeName, p));
     }
 #endif
+
+    // add the proto and JSClass to the type->js info hash table
+    JS::RootedValue className(cx);
+    JSString* jsstr = JS_NewStringCopyZ(cx, "PluginKochava");
+    className = JS::StringValue(jsstr);
+    JS_SetProperty(cx, proto, "_className", className);
+    JS_SetProperty(cx, proto, "__nativeObj", JS::TrueHandleValue);
+    JS_SetProperty(cx, proto, "__is_ref", JS::FalseHandleValue);
 }
 #else
 void js_register_PluginKochavaJS_PluginKochava(JSContext *cx, JSObject *global) {
